@@ -1,0 +1,120 @@
+<div class="app-container">
+  <!-- Added minimal course header without emojis -->
+  <header class="course-header">
+    <div class="course-info">
+      <h1>Visualizador de Árboles</h1>
+      <p class="course-details">
+        Materia Tópico I - Matemáticas discretas | Maestría en Ciencias de la Ingeniería
+      </p>
+      <p class="professor">Profesor: Dr. Gilberto Borrego Soto</p>
+    </div>
+  </header>
+
+  <div class="tree-wrapper">
+    <div class="tree-canvas">
+      <div #cyContainer class="cy-container"></div>
+    </div>
+
+    <div class="tree-info">
+      <h2>Constructor de árbol</h2>
+
+      <div class="error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Si no hay nodos, primero se crea la raíz -->
+      <div *ngIf="treeSize === 0; else agregarNodo">
+        <h3>Crear raíz</h3>
+
+        <label>
+          Etiqueta de la raíz:
+          <input type="text" [(ngModel)]="formRoot.label" />
+        </label>
+
+        <button type="button" (click)="addRoot()">
+          Crear raíz
+        </button>
+      </div>
+
+      <!-- Una vez creada la raíz, se pueden agregar más nodos -->
+      <ng-template #agregarNodo>
+        <h3>Agregar nodo</h3>
+
+        <label>
+          Etiqueta:
+          <input type="text" [(ngModel)]="formNode.label" />
+        </label>
+
+        <label>
+          Padre:
+          <select [(ngModel)]="formNode.parentId">
+            <option [ngValue]="null" disabled>Selecciona un padre</option>
+            <option *ngFor="let n of treeData" [ngValue]="n.id">
+              {{ n.label }}
+            </option>
+          </select>
+        </label>
+
+        <button type="button" (click)="addNode()">
+          Agregar nodo
+        </button>
+      </ng-template>
+
+      <button
+        type="button"
+        class="reset-btn"
+        (click)="resetTree()"
+        [disabled]="treeSize === 0"
+      >
+        Limpiar árbol
+      </button>
+
+      <hr />
+
+      <h2>Información del árbol</h2>
+      <p><strong>Tamaño del árbol:</strong> {{ treeSize }} nodos</p>
+
+      <h3>Información del nodo seleccionado</h3>
+      <ng-container *ngIf="selectedInfo; else noNode">
+        <p><strong>Etiqueta:</strong> {{ selectedInfo?.label }}</p>
+
+        <p>
+          <strong>Padre:</strong>
+          <span *ngIf="selectedInfo?.parentLabel; else esRaiz">
+            {{ selectedInfo?.parentLabel }}
+          </span>
+        </p>
+        <ng-template #esRaiz>
+          <span>Es la raíz o no tiene padre</span>
+        </ng-template>
+
+        <p>
+          <strong>Hijos:</strong>
+          <span *ngIf="selectedInfo?.childrenLabels?.length! > 0; else sinHijos">
+            {{ selectedInfo?.childrenLabels?.join(', ') }}
+          </span>
+        </p>
+        <ng-template #sinHijos>
+          <span>Sin hijos (es hoja)</span>
+        </ng-template>
+
+        <p>
+          <strong>Hermanos:</strong>
+          <span *ngIf="selectedInfo?.siblingsLabels?.length! > 0; else sinHermanos">
+            {{ selectedInfo?.siblingsLabels?.join(', ') }}
+          </span>
+        </p>
+        <ng-template #sinHermanos>
+          <span>No tiene hermanos</span>
+        </ng-template>
+
+        <p><strong>Nivel:</strong> {{ selectedInfo?.level }}</p>
+        <p><strong>Tamaño del subárbol:</strong> {{ selectedInfo?.subtreeSize }} nodos</p>
+      </ng-container>
+
+      <ng-template #noNode>
+        <p>Haz clic en un nodo para ver su información.</p>
+      </ng-template>
+    </div>
+  </div>
+</div>
